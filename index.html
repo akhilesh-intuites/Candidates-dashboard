@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email ATM Dashboard</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1>Candidate Dashboard</h1>
+    <div id="connectionStatus" class="status">Checking Supabase connection...</div>
+  </header>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="left-buttons">
+      <button id="openFormBtn" class="btn primary">➕ Add Candidate</button>
+      <button id="titleMapBtn" class="btn secondary">📌 Title Map</button>
+    </div>
+
+    <div class="right-search">
+      <input id="searchInput" type="text" class="search-box"
+        placeholder="Search name, email, skills, title, recruiter, location…" />
+    </div>
+  </div>
+
+  <!-- CANDIDATE FORM -->
+  <form id="candidateForm" class="card hidden">
+    <input type="hidden" id="uniqueId" />
+
+    <h2 class="section-title">Candidate Details</h2>
+
+    <div class="form-grid">
+
+      <input id="candidateName" type="text" placeholder="Candidate Name" required>
+      <input id="contactNo" type="tel" placeholder="Contact No" required>
+      <input id="email" type="email" placeholder="Email" required>
+      <input id="skills" type="text" placeholder="Skills" required>
+      <input id="visaStatus" type="text" placeholder="Visa Status" required>
+      <input id="skypeId" type="text" placeholder="Skype ID">
+
+      <input id="currentLocation" type="text" placeholder="Current Location" required>
+      <input id="dob" type="text" placeholder="DOB (MM/DD)">
+      <input id="relocation" type="text" placeholder="Relocation (Yes/No)" required>
+      <input id="onsiteRemote" type="text" placeholder="Onsite or Remote" required>
+      <input id="bachelor" type="text" placeholder="Bachelor (University/Year)">
+      <input id="masters" type="text" placeholder="Master's (University/Year)">
+
+      <input id="ssn" type="text" placeholder="SSN Last 4 Digits" required>
+      <input id="linkedin" type="url" placeholder="LinkedIn URL" required>
+      <input id="ppNo" type="text" placeholder="Passport No" required>
+      <input id="totalExp" type="text" placeholder="Total Experience" required>
+      <input id="expUS" type="text" placeholder="Experience in US" required>
+      <input id="availProject" type="text" placeholder="Availability for Project">
+
+      <input id="availInterview" type="text" placeholder="Availability for Interview">
+      <input id="bestTime" type="text" placeholder="Best Time to Reach">
+      <input id="resume" type="url" placeholder="Resume Link" required>
+      <input id="dl" type="url" placeholder="DL Link" required >
+      <input id="title" type="text" placeholder="Title" required>
+      <input id="rate" type="text" placeholder="Rate" required >
+
+      <input id="recruiterName" type="text" placeholder="Recruiter Name" required>
+      <input id="recruiterEmail" type="email" placeholder="Recruiter Email" required>
+      <input id="recruiterPhone" type="tel" placeholder="Recruiter Phone" required>
+      <input id="match" type="text" placeholder="Match" required >
+    </div>
+
+    <div class="form-actions">
+      <button id="submitBtn" type="submit" class="btn primary">Save Candidate</button>
+      <button id="cancelEditBtn" type="button" class="btn secondary hidden">Cancel Edit</button>
+    </div>
+  </form>
+
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Unique</th>
+          <th>Name</th>
+          <th>Contact</th>
+          <th>Email</th>
+          <th>Skills</th>
+          <th>Visa</th>
+          <th>Skype</th>
+          <th>Location</th>
+          <th>DOB</th>
+          <th>Relocation</th>
+          <th>Onsite/Remote</th>
+          <th>Bachelor</th>
+          <th>Title</th>
+          <th>Rate</th>
+          <th>Recruiter</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- DELETE MODAL -->
+  <div id="deleteModal" class="modal hidden">
+    <div class="modal-content small">
+      <p id="deleteText"></p>
+      <div class="modal-actions">
+        <button id="confirmDeleteBtn" class="btn danger">Yes, Delete</button>
+        <button id="cancelDeleteBtn" class="btn secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TITLE MAP POPUP -->
+  <div id="titleMapPopup" class="overlay hidden">
+    <div class="popup card">
+
+      <button id="closeTitleMap" class="close-btn">✖</button>
+      <h2 class="section-title">Title Map</h2>
+
+      <div class="popup-header">
+        <input id="searchInputTM" type="text" class="search-box small" placeholder="Search titles…">
+        <button id="openAddBtnTM" class="btn primary">Add</button>
+      </div>
+
+      <div id="list" class="title-list"></div>
+
+      <!-- ADD MODAL -->
+      <div id="modalBack" class="modal hidden">
+        <div class="modal-content">
+
+          <h3 id="modalTitle">Add</h3>
+
+          <!-- Mode -->
+          <div class="modal-row">
+            <label>Mode</label>
+            <select id="modeSelect" class="input">
+              <option value="title">Add Title</option>
+              <option value="item">Add ID to Title</option>
+            </select>
+          </div>
+
+          <!-- Add Title -->
+          <div id="titleFields" class="modal-row">
+            <label>New Title</label>
+            <input id="newTitleInput" class="input" placeholder="Enter new title">
+          </div>
+
+          <!-- Add Item -->
+          <div id="itemFields" class="modal-row" style="display:none;">
+            <label>Select Title</label>
+            <select id="selectTitleForItem" class="input"></select>
+          </div>
+
+          <div id="itemNameRow" class="modal-row" style="display:none; position:relative;">
+            <label>Item / ID</label>
+            <input id="newItemInput" class="input" placeholder="Type ID or Name">
+
+            <!-- SUGGESTION BOX -->
+            <div id="suggestionContainer"></div>
+          </div>
+          <div class="modal-actions">
+            <button id="submitModalBtn" class="btn primary">Save</button>
+            <button id="cancelBtnTM" class="btn secondary">Cancel</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- EDIT MODAL -->
+      <div id="editBack" class="modal hidden">
+        <div class="modal-content">
+          <h3>Edit</h3>
+          <div id="editFields"></div>
+          <div class="modal-actions">
+            <button id="editSave" class="btn primary">Save</button>
+            <button id="editCancel" class="btn secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+
+</body>
+</html>
